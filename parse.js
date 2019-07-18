@@ -1,41 +1,16 @@
 const { createInterface } = require('readline');
 const { createReadStream } = require('fs');
 
-async function parse(path) {
-  let fileName = path.substring(path.lastIndexOf('/') + 1, path.indexOf('.'));
-  let benchmark = {
-    [fileName]: {}
-  };
+const parse = async path => {
+  let benchmark = {};
 
   let objectiveFunction = await readObjectiveFunction(path);
-  benchmark[fileName].lastColumn = await readLastColumns(path);
-  benchmark[fileName].matrix = await readConstraints(path, objectiveFunction);
+  benchmark = await readConstraints(path, objectiveFunction);
 
   return benchmark;
-}
+};
 
-function readLastColumns(path) {
-  let values = [];
-  let value;
-
-  let lineReader = createInterface({
-    input: createReadStream(path)
-  });
-
-  return new Promise(resolve => {
-    lineReader.on('line', line => {
-      if (line.includes('>=')) {
-        value = line.substring(line.indexOf('>=') + 3, line.indexOf(';'));
-        values.push(Number(value));
-      }
-    });
-    lineReader.on('close', () => {
-      resolve(values);
-    });
-  });
-}
-
-function readObjectiveFunction(path) {
+const readObjectiveFunction = path => {
   let objectiveFunction = [];
   let singleLine;
 
@@ -59,16 +34,14 @@ function readObjectiveFunction(path) {
       resolve(objectiveFunction);
     });
   });
-}
+};
 
-function readConstraints(path, objectiveFunction) {
+const readConstraints = (path, objectiveFunction) => {
   let matrix = [];
   let singleLine;
   let lineReader = createInterface({
     input: createReadStream(path)
   });
-
-  matrix.push(objectiveFunction);
 
   return new Promise(resolve => {
     lineReader.on('line', line => {
@@ -84,9 +57,10 @@ function readConstraints(path, objectiveFunction) {
       }
     });
     lineReader.on('close', () => {
+      matrix.push(objectiveFunction);
       resolve(matrix);
     });
   });
-}
+};
 
 module.exports = parse;
