@@ -10,7 +10,9 @@ const paths = [];
 const startLinearProgramm = () => {
   parseBenchmarks('benchmarks')
     .then(benchmarks => transpose(benchmarks))
-    .then(transposedBenchmarks => createTableau(transposedBenchmarks));
+    .then(transposedBenchmarks => {
+      createTableau(transposedBenchmarks);
+    });
 };
 
 const parseBenchmarks = async folder => {
@@ -52,7 +54,6 @@ const createTableau = transposedBenchmarks => {
   return new Promise(resolve => {
     transposedBenchmarks.forEach((benchmark, i) => {
       addSlackVars(benchmark).then(benchmark => {
-        // console.log(chalk.red(i), benchmark);
         simplex(benchmark);
       });
     });
@@ -61,6 +62,7 @@ const createTableau = transposedBenchmarks => {
 
 const addSlackVars = benchmark => {
   return new Promise(resolve => {
+    let rowLength;
     benchmark.forEach((row, i) => {
       const rightHandSideVal = row.pop();
 
@@ -71,8 +73,13 @@ const addSlackVars = benchmark => {
       let secondRowPart = [...firstZeroArray, 1, ...secondZeroArray];
 
       benchmark[i] = [...firstRowPart, ...secondRowPart, rightHandSideVal];
-      benchmark[benchmark.length - 1][row.length - 2] = 0;
+      rowLength = row.length;
     });
+    console.log(benchmark[benchmark.length - 1][benchmark[0].length - 2]);
+    benchmark[benchmark.length - 1][benchmark[0].length - 2] = 0;
+    console.log('-------------');
+    console.log(benchmark);
+    console.log('-------------');
     resolve(benchmark);
   });
 };

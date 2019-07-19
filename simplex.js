@@ -1,13 +1,17 @@
 const chalk = require('chalk');
 
 const simplex = tableau => {
+  // console.log('-------------');
+  // console.log(JSON.stringify(tableau));
+  // console.log('-------------');
   if (tableau[tableau.length - 1].every(el => el <= 0)) {
-    console.log(chalk.green(tableau[tableau.length - 1]));
+    console.log('-------------');
+    console.log(chalk.green(JSON.stringify(tableau)));
+    console.log('-------------');
     return tableau;
   }
 
   const tablo = [...tableau];
-  console.log(tablo[tablo.length - 1]);
   const objFunction = tablo[tablo.length - 1];
   // console.log('OBJ', objFunction);
   const pivoColIndex = objFunction.indexOf(Math.max(...objFunction));
